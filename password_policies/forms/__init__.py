@@ -272,6 +272,7 @@ class PasswordResetForm(forms.Form):
 
     def save(
         self,
+        token=None,
         domain_override=None,
         subject_template_name="registration/password_reset_subject.txt",
         email_template_name="registration/password_reset_email.txt",
@@ -309,6 +310,7 @@ class PasswordResetForm(forms.Form):
             c["timestamp"] = var[1]
             c["uid"] = urlsafe_base64_encode(force_bytes(user.id))
             c["user"] = user
+            c["token"] = token.make_token(user)
             subject = loader.render_to_string(subject_template_name, c)
             # Email subject *must not* contain newlines
             subject = "".join(subject.splitlines())

@@ -1,6 +1,8 @@
+from django.conf import settings as project_settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.tokens import default_token_generator
 from django.core import signing
 from django.utils import timezone
 
@@ -148,7 +150,7 @@ class PasswordResetCompleteView(AdminSiteContextMixin, LoggedOutMixin, TemplateV
         """
         Adds the login URL to redirect to (defaults to the LOGIN_URL setting
         in Django) to the view's context."""
-        kwargs["login_url"] = resolve_url(settings.LOGIN_URL)
+        kwargs["login_url"] = resolve_url(project_settings.LOGIN_URL)
         return super().get_context_data(**kwargs)
 
 
@@ -166,9 +168,10 @@ class PasswordResetConfirmView(AdminSiteContextMixin, LoggedOutMixin, FormView):
     # @method_decorator(sensitive_post_parameters)
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
-        self.uidb64 = args[0]
-        self.timestamp = args[1]
-        self.signature = args[2]
+        self.uidb64 = kwargs["uidb64"] 
+        self.token = kwargs["token"] 
+        self.timestamp = kwargs["timestamp"] 
+        self.signature = kwargs["signature"] 
         self.validlink = False
         if self.uidb64 and self.timestamp and self.signature:
             try:
@@ -260,9 +263,11 @@ class PasswordResetFormView(AdminSiteContextMixin, LoggedOutMixin, FormView):
     #: the same template used
     #: by :func:`django.contrib.views.password_reset`.
     template_name = "registration/password_reset_form.html"
+    token_generator = default_token_generator
 
     def form_valid(self, form):
         opts = {
+            "token": self.token_generator,
             "use_https": self.request.is_secure(),
             "from_email": self.from_email,
             "email_template_name": self.email_template_name,

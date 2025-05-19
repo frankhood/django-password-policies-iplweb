@@ -1,4 +1,5 @@
-from django.urls import path, re_path
+from django.urls import path
+from django.contrib import admin
 
 try:
     # patterns was deprecated in Django 1.8
@@ -16,19 +17,33 @@ urlpatterns = [
         name="password_change_done",
     ),
     path("change/", views.PasswordChangeFormView.as_view(), name="password_change"),
-    path("reset/", views.PasswordResetFormView.as_view(), name="password_reset"),
     path(
-        "reset/complete/",
-        views.PasswordResetCompleteView.as_view(),
-        name="password_reset_complete",
+        "reset/",
+        views.PasswordResetFormView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
+        name="admin_password_reset",
     ),
-    re_path(
-        r"^reset/confirm/([0-9A-Za-z_\-]+)/([0-9A-Za-z]{1,13})/([0-9A-Za-z-=_]{1,128})/$",
-        views.PasswordResetConfirmView.as_view(),
+    path(
+        "reset/done/",
+        views.PasswordResetDoneView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "reset/confirm/<uidb64>/<token>/<timestamp>/<signature>",
+        views.PasswordResetConfirmView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
         name="password_reset_confirm",
     ),
     path(
-        "reset/done/", views.PasswordResetDoneView.as_view(), name="password_reset_done"
+        "reset/complete/",
+        views.PasswordResetCompleteView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
+        name="password_reset_complete",
     ),
 ]
 
