@@ -7,7 +7,7 @@ from django.core import signing
 from django.utils import timezone
 
 try:
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 except ImportError:
     from django.urls.base import reverse
 
@@ -136,106 +136,6 @@ class PasswordChangeFormView(AdminSiteContextMixin, FormView):
         return super().get_context_data(**kwargs)
 
 
-class PasswordResetCompleteView(AdminSiteContextMixin, LoggedOutMixin, TemplateView):
-    """
-    A view to redirect to after a password reset has been successfully
-    confirmed."""
-
-    #: The template used by this view. Defaults to
-    #: the same template used
-    #: by :func:`django.contrib.views.password_reset_complete`.
-    template_name = "registration/password_reset_complete.html"
-
-    def get_context_data(self, **kwargs):
-        """
-        Adds the login URL to redirect to (defaults to the LOGIN_URL setting
-        in Django) to the view's context."""
-        kwargs["login_url"] = resolve_url(project_settings.LOGIN_URL)
-        return super().get_context_data(**kwargs)
-
-
-class PasswordResetConfirmView(AdminSiteContextMixin, LoggedOutMixin, FormView):
-    #: The form used by this view.
-    form_class = forms.PasswordPoliciesForm
-    #: An URL to redirect to after the form has been successfully
-    #: validated.
-    success_url = None
-    #: The template used by this view. Defaults to
-    #: the same template used
-    #: by :func:`django.contrib.views.password_reset_confirm`.
-    template_name = "registration/password_reset_confirm.html"
-
-    # @method_decorator(sensitive_post_parameters)
-    @method_decorator(never_cache)
-    def dispatch(self, request, *args, **kwargs):
-        self.uidb64 = kwargs["uidb64"] 
-        self.token = kwargs["token"] 
-        self.timestamp = kwargs["timestamp"] 
-        self.signature = kwargs["signature"] 
-        self.validlink = False
-        if self.uidb64 and self.timestamp and self.signature:
-            try:
-                uid = force_str(urlsafe_base64_decode(self.uidb64))
-                self.user = get_user_model().objects.get(id=uid)
-            except (ValueError, get_user_model().DoesNotExist):
-                self.user = None
-            else:
-                signer = signing.TimestampSigner()
-                max_age = settings.PASSWORD_RESET_TIMEOUT
-                il = (self.user.password, self.timestamp, self.signature)
-                try:
-                    signer.unsign(":".join(il), max_age=max_age)
-                except (signing.BadSignature, signing.SignatureExpired):
-                    pass
-                else:
-                    self.validlink = True
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-    def get(self, request, *args, **kwargs):
-        if self.validlink:
-            return super().get(request, *args, **kwargs)
-        return self.render_to_response(self.get_context_data())
-
-    def get_context_data(self, **kwargs):
-        kwargs["user"] = self.user
-        kwargs["validlink"] = self.validlink
-        return super().get_context_data(**kwargs)
-
-    def get_form(self, form_class=None):
-        if form_class is None:
-            form_class = self.get_form_class()
-        return form_class(self.user, **self.get_form_kwargs())
-
-    def get_success_url(self):
-        """
-        Redirects to :attr:`~PasswordResetConfirmView.success_url`
-        if set, otherwise to the :class:`PasswordResetCompleteView`."""
-        if self.success_url:
-            url = self.success_url
-        else:
-            url = reverse("password_reset_complete")
-        return url
-
-    def post(self, request, *args, **kwargs):
-        if self.validlink:
-            return super().post(request, *args, **kwargs)
-        return self.render_to_response(self.get_context_data())
-
-
-class PasswordResetDoneView(AdminSiteContextMixin, LoggedOutMixin, TemplateView):
-    """
-    A view to redirect to after a password reset has been requested."""
-
-    #: The template used by this view. Defaults to
-    #: the same template used
-    #: by :func:`django.contrib.views.password_reset_done`.
-    template_name = "registration/password_reset_done.html"
-
-
 class PasswordResetFormView(AdminSiteContextMixin, LoggedOutMixin, FormView):
     """
     A view that allows registered users to change their password."""
@@ -293,3 +193,103 @@ class PasswordResetFormView(AdminSiteContextMixin, LoggedOutMixin, FormView):
         else:
             url = reverse("password_reset_done")
         return url
+
+
+class PasswordResetDoneView(AdminSiteContextMixin, LoggedOutMixin, TemplateView):
+    """
+    A view to redirect to after a password reset has been requested."""
+
+    #: The template used by this view. Defaults to
+    #: the same template used
+    #: by :func:`django.contrib.views.password_reset_done`.
+    template_name = "registration/password_reset_done.html"
+
+
+class PasswordResetConfirmView(AdminSiteContextMixin, LoggedOutMixin, FormView):
+    #: The form used by this view.
+    form_class = forms.PasswordPoliciesForm
+    #: An URL to redirect to after the form has been successfully
+    #: validated.
+    success_url = None
+    #: The template used by this view. Defaults to
+    #: the same template used
+    #: by :func:`django.contrib.views.password_reset_confirm`.
+    template_name = "registration/password_reset_confirm.html"
+
+    # @method_decorator(sensitive_post_parameters)
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        self.uidb64 = kwargs.get("uidb64")
+        self.token = kwargs.get("token")
+        self.timestamp = kwargs.get("timestamp")
+        self.signature = kwargs.get("signature")
+        self.validlink = False
+        if self.uidb64 and self.timestamp and self.signature:
+            try:
+                uid = force_str(urlsafe_base64_decode(self.uidb64))
+                self.user = get_user_model().objects.get(id=uid)
+            except (ValueError, get_user_model().DoesNotExist):
+                self.user = None
+            else:
+                signer = signing.TimestampSigner()
+                max_age = settings.PASSWORD_RESET_TIMEOUT
+                il = (self.user.password, self.timestamp, self.signature)
+                try:
+                    signer.unsign(":".join(il), max_age=max_age)
+                except (signing.BadSignature, signing.SignatureExpired):
+                    pass
+                else:
+                    self.validlink = True
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get(self, request, *args, **kwargs):
+        if self.validlink:
+            return super().get(request, *args, **kwargs)
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        kwargs["user"] = self.user
+        kwargs["validlink"] = self.validlink
+        return super().get_context_data(**kwargs)
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(self.user, **self.get_form_kwargs())
+
+    def get_success_url(self):
+        """
+        Redirects to :attr:`~PasswordResetConfirmView.success_url`
+        if set, otherwise to the :class:`PasswordResetCompleteView`."""
+        if self.success_url:
+            url = self.success_url
+        else:
+            url = reverse("password_reset_complete")
+        return url
+
+    def post(self, request, *args, **kwargs):
+        if self.validlink:
+            return super().post(request, *args, **kwargs)
+        return self.render_to_response(self.get_context_data())
+
+
+class PasswordResetCompleteView(AdminSiteContextMixin, LoggedOutMixin, TemplateView):
+    """
+    A view to redirect to after a password reset has been successfully
+    confirmed."""
+
+    #: The template used by this view. Defaults to
+    #: the same template used
+    #: by :func:`django.contrib.views.password_reset_complete`.
+    template_name = "registration/password_reset_complete.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Adds the login URL to redirect to (defaults to the LOGIN_URL setting
+        in Django) to the view's context."""
+        kwargs["login_url"] = resolve_url(project_settings.LOGIN_URL)
+        return super().get_context_data(**kwargs)

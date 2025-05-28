@@ -23,86 +23,101 @@ exclude: |
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.7.0
+    rev: v3.15.2
     hooks:
-    - id: pyupgrade
-      stages: [commit]
-      name: "✅ Python Upgrade"
-      args:
-        - "--py36-plus"
-        - "--py37-plus"
-        - "--py38-plus"
-        - "--py39-plus"
-        - "--py310-plus"
-        - "--py311-plus"
+      - id: pyupgrade
+        stages: [pre-commit]
+        name: "✅ Python Upgrade"
+        args:
+          - "--py38-plus"
+          - "--py39-plus"
+          - "--py310-plus"
+          - "--py311-plus"
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.14.0  # replace with latest tag on GitHub
+    rev: 1.16.0
     hooks:
-    -   id: django-upgrade
-        stages: [commit]
+      - id: django-upgrade
+        stages: [pre-commit]
         name: "✅ Django Upgrade"
         args: [--target-version, "4.2"]
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 25.1.0
     hooks:
-    - id: black
-      stages: [commit]
-      name: "✅ Black Reformatting"
-      exclude: ^.*\b(migrations)\b.*$
+      - id: black
+        stages: [pre-commit]
+        name: "✅ Black Reformatting"
+        exclude: ^.*\b(migrations)\b.*$
   - repo: https://github.com/PyCQA/autoflake
-    rev: v1.4
+    rev: v2.3.1
     hooks:
-    - id: autoflake
-      stages: [commit]
-      name: "✅ Autoflake Reformatting"
-      language: python
-      'types': [python]
-      require_serial: true
-      exclude: |
-        (?x)(
-          .*?/migrations/.* 
-        )
-      entry: autoflake
-      args:
-        - "--ignore-init-module-imports"
-        - "--remove-all-unused-imports"
-        - "--in-place"
-        - "--remove-unused-variables"
+      - id: autoflake
+        stages: [pre-commit]
+        name: "✅ Autoflake Reformatting"
+        language: python
+        "types": [python]
+        require_serial: true
+        exclude: |
+          (?x)(
+            .*?/migrations/.* 
+          )
+        entry: autoflake
+        args:
+          - "--ignore-init-module-imports"
+          - "--remove-all-unused-imports"
+          - "--in-place"
+          - "--remove-unused-variables"
   - repo: https://github.com/PyCQA/flake8
-    rev: 3.8.0
+    rev: 7.0.0
     hooks:
-    - id: flake8
-      stages: [commit]
-      name: "✅ Flake8 Validation"
+      - id: flake8
+        stages: [pre-commit]
+        name: "✅ Flake8 Validation"
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 6.0.1
     hooks:
-    - id: isort
-      stages: [commit]
-      name: "✅ Isort Validation"
-  - repo: local
-    hooks:
-    - id: mypy
-      stages: [commit]
-      name: "✅ Mypy Validation"
-      entry: mypy
-      language: python
-      types: [python]
-      args: ["--install-types", "--non-interactive", "--python-version=3.11"]
-      additional_dependencies: [
-        "mypy~=0.931"
-      ]
+      - id: isort
+        stages: [pre-commit]
+        name: "✅ Isort Validation"
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1  # Use the ref you want to point at
+    rev: v5.0.0
     hooks:
-    - id: check-merge-conflict
-      name: "✅ Checking Merge Conflict"
+      - id: check-merge-conflict
+        name: "✅ Checking Merge Conflict"
+  - repo: https://github.com/frankhood/pre-commit-hooks-django-migrations
+    rev: 0.1.5
+    hooks:
+      - id: makemigrations-check-absent
+        name: "✅ Check for absent migrations"
+  - repo: https://github.com/ecugol/pre-commit-hooks-django
+    rev: v0.4.0
+    hooks:
+      # - id: check-unapplied-migrations
+      #   name: "✅ Check for unapplied migrations"
+        # entry: python manage.py migrate --check
+      - id: check-untracked-migrations
+        name: "✅ Check for untracked migrations"
   - repo: local
     hooks:
-    - id: django-test
-      name: "🪲 Django Testing"
-      entry: python runtests.py
-      always_run: true
-      verbose: true
-      pass_filenames: false
-      language: system
+      - id: mypy
+        stages: [pre-commit]
+        name: "✅ Mypy Validation"
+        language: python
+        types: [python]
+        pass_filenames: false
+        always_run: true
+        entry: mypy --install-types --non-interactive --check-untyped-defs
+        additional_dependencies: ["mypy<1"]
+      - id: django-check
+        name: "✅ Django Check"
+        entry: python manage.py check
+        always_run: true
+        verbose: false
+        pass_filenames: false
+        language: system
+      - id: django-test
+        name: "🪲 Django Testing"
+        entry: python runtests.py
+        always_run: true
+        verbose: true
+        pass_filenames: false
+        language: system

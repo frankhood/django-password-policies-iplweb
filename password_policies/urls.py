@@ -1,5 +1,5 @@
-from django.urls import path
 from django.contrib import admin
+from django.urls import path
 
 try:
     # patterns was deprecated in Django 1.8
