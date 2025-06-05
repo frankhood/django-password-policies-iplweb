@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 
 try:
     # patterns was deprecated in Django 1.8
@@ -22,7 +22,7 @@ urlpatterns = [
         views.PasswordResetFormView.as_view(
             extra_context={"site_header": admin.site.site_header}
         ),
-        name="admin_password_reset",
+        name="password_reset",
     ),
     path(
         "reset/done/",
@@ -31,8 +31,8 @@ urlpatterns = [
         ),
         name="password_reset_done",
     ),
-    path(
-        "reset/confirm/<uidb64>/<token>/<timestamp>/<signature>",
+    re_path(
+        r"^reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9a-z]{1,13}-[0-9a-f]{1,40})/(?P<timestamp>[0-9A-Za-z]{1,13})/(?P<signature>[0-9A-Za-z-=_]{1,128})/$",
         views.PasswordResetConfirmView.as_view(
             extra_context={"site_header": admin.site.site_header}
         ),
