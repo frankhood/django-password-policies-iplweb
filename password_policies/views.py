@@ -1,4 +1,4 @@
-from django.conf import settings as project_settings
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -24,7 +24,7 @@ from django.views.generic.edit import FormView
 
 from password_policies import forms
 from password_policies.compat import is_authenticated
-from password_policies.conf import settings
+from password_policies.conf import settings as app_settings
 from password_policies.exceptions import MustBeLoggedOutException
 from password_policies.utils import datetime_to_string
 
@@ -38,7 +38,7 @@ class LoggedOutMixin(View):
 
     def dispatch(self, request, *args, **kwargs):
         if is_authenticated(request.user):
-            template_name = settings.TEMPLATE_403_PAGE
+            template_name = app_settings.TEMPLATE_403_PAGE
             return permission_denied(
                 request, MustBeLoggedOutException, template_name=template_name
             )
@@ -82,7 +82,7 @@ class PasswordChangeFormView(AdminSiteContextMixin, FormView):
     #: by :func:`django.contrib.views.password_change`.
     template_name = "registration/password_change_form.html"
     #: doc
-    redirect_field_name = settings.REDIRECT_FIELD_NAME
+    redirect_field_name = app_settings.REDIRECT_FIELD_NAME
 
     # @method_decorator(sensitive_post_parameters)
     @method_decorator(csrf_protect)
@@ -112,9 +112,9 @@ class PasswordChangeFormView(AdminSiteContextMixin, FormView):
         user was requesting before the password change.)
         If not returns the :attr:`~PasswordChangeFormView.success_url` attribute
         if set, otherwise the URL to the :class:`PasswordChangeDoneView`."""
-        checked = settings.PASSWORD_POLICIES_LAST_CHECKED_SESSION_KEY
-        last = settings.PASSWORD_POLICIES_LAST_CHANGED_SESSION_KEY
-        required = settings.PASSWORD_POLICIES_CHANGE_REQUIRED_SESSION_KEY
+        checked = app_settings.PASSWORD_POLICIES_LAST_CHECKED_SESSION_KEY
+        last = app_settings.PASSWORD_POLICIES_LAST_CHANGED_SESSION_KEY
+        required = app_settings.PASSWORD_POLICIES_CHANGE_REQUIRED_SESSION_KEY
         now = timezone.now()
         now_str = datetime_to_string(now)
 
@@ -232,7 +232,7 @@ class PasswordResetConfirmView(AdminSiteContextMixin, LoggedOutMixin, FormView):
                 self.user = None
             else:
                 signer = signing.TimestampSigner()
-                max_age = settings.PASSWORD_RESET_TIMEOUT
+                max_age = app_settings.PASSWORD_RESET_TIMEOUT
                 il = (self.user.password, self.timestamp, self.signature)
                 try:
                     signer.unsign(":".join(il), max_age=max_age)
@@ -291,5 +291,5 @@ class PasswordResetCompleteView(AdminSiteContextMixin, LoggedOutMixin, TemplateV
         """
         Adds the login URL to redirect to (defaults to the LOGIN_URL setting
         in Django) to the view's context."""
-        kwargs["login_url"] = resolve_url(project_settings.LOGIN_URL)
+        kwargs["login_url"] = resolve_url(settings.LOGIN_URL)
         return super().get_context_data(**kwargs)
