@@ -2,7 +2,7 @@ from django.test import TestCase, override_settings
 from django.utils.encoding import force_str
 
 from password_policies import forms
-from password_policies.tests import lib
+from tests.example import lib
 
 
 class PasswordPoliciesFieldTest(TestCase):

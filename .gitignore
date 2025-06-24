@@ -71,3 +71,4 @@ GitHub.sublime-settings
 
 venv
 .venv
+db.sqlite3

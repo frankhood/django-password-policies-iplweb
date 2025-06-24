@@ -15,7 +15,7 @@ from password_policies.forms import (
     PasswordResetForm,
 )
 from password_policies.models import PasswordHistory
-from password_policies.tests.lib import create_user, passwords
+from tests.example.lib import create_user, passwords
 from password_policies.utils import datetime_to_string, string_to_datetime
 
 
@@ -394,20 +394,20 @@ class PasswordResetFormViewTestCase(TestCase):
         return super().setUp()
 
     def test_get_ok(self):
-        response = self.client.get(reverse("password_reset"))
+        response = self.client.get(reverse("admin_password_reset"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(isinstance(response.context["form"], PasswordResetForm))
         self.assertTemplateUsed(response, "registration/password_reset_form.html")
 
     def test_post_ok(self):
         data = {"email": self.user.email}
-        response = self.client.post(reverse("password_reset"), data=data)
+        response = self.client.post(reverse("admin_password_reset"), data=data)
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(response.url, reverse("password_reset_done"))
 
     def test_post_not_ok(self):
         data = {"email": "emailnotok@gmail.com"}
-        response = self.client.post(reverse("password_reset"), data=data)
+        response = self.client.post(reverse("admin_password_reset"), data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 

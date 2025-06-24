@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from password_policies.models import PasswordChangeRequired, PasswordHistory
-from password_policies.tests.lib import create_password_history, create_user
+from tests.example.lib import create_password_history, create_user
 from password_policies.utils import PasswordCheck
 
 

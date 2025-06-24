@@ -31,16 +31,28 @@ Add django-password-policies-iplweb's URL patterns:
 
 ```python
     path(
-        "admin/password_change/",
+        "password_change/",
         RedirectView.as_view(pattern_name="password_change", permanent=False),
     ),
-    path("admin/password/", include("password_policies.urls")),
+    path(
+        "admin/",
+        include(
+            [
+                path("", admin.site.urls),
+                path("password/", include("password_policies.urls")),
+            ]
+        ),
+    ),
 ```
+
+Add in your project/templates/registration password_reset_email.html and password_reset_email.txt like files in tests/example/templates/registration.
+
+The link "Forgotten your password or username?" in admin was generated creating url with name "admin_password_reset".
 
 ## Credits
 ---
 
-Strumenti utilizzati per la creazione di questo package:
+Tools for create this package:
 
 * [Cookiecutter](https://github.com/audreyr/cookiecutter)
 * [cookiecutter-djangopackage](https://github.com/pydanny/cookiecutter-djangopackage)

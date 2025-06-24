@@ -5,7 +5,10 @@ from django import get_version
 
 django_version = get_version()
 
-DEBUG = False
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+DEBUG = True
 
 LANGUAGES = (("en", "English"),)
 
@@ -23,7 +26,6 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    "django.contrib.sites",
     "django.contrib.messages",
     "password_policies",
 ]
@@ -31,15 +33,15 @@ INSTALLED_APPS = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
-        "TEST_NAME": ":memory:",
-        "USER": "",
-        "PASSWORD": "",
-        "PORT": "",
-    },
+        "NAME": os.path.join(BASE_DIR, "tests", "db.sqlite3"),
+    }
 }
 
-ROOT_URLCONF = "password_policies.tests.urls"
+LOGIN_URL = "/admin/login/"
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+ROOT_URLCONF = "tests.example.urls"
 
 SITE_ID = 1
 
@@ -59,7 +61,7 @@ else:
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
             "DIRS": [
-                os.path.join(os.path.dirname(__file__), "templates"),
+                os.path.join(BASE_DIR, "templates"),
             ],
             "APP_DIRS": True,
             "OPTIONS": {
@@ -74,6 +76,10 @@ else:
         },
     ]
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "/static/"
+
+
 MIDDLEWARE = (
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -84,6 +90,5 @@ MIDDLEWARE = (
 )
 
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
-
 
 MEDIA_URL = "/media/somewhere/"
