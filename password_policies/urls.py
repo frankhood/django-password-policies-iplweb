@@ -22,7 +22,7 @@ urlpatterns = [
         views.PasswordResetFormView.as_view(
             extra_context={"site_header": admin.site.site_header}
         ),
-        name="password_reset",
+        name="admin_password_reset",
     ),
     path(
         "reset/done/",
