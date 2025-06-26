@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from password_policies.conf import settings
 from password_policies.models import PasswordChangeRequired, PasswordHistory
-from password_policies.tests import lib
+from tests.example import lib
 
 
 def get_response_location(location):
@@ -19,7 +19,7 @@ def get_response_location(location):
 class PasswordPoliciesMiddlewareTest(TestCase):
     def setUp(self):
         self.user = lib.create_user()
-        self.redirect_url = "http://testserver/password/change/?next=/"
+        self.redirect_url = "http://testserver/admin/password/change/?next=/"
 
     def test_password_middleware_without_history(self):
         seconds = settings.PASSWORD_DURATION_SECONDS - 60
@@ -114,7 +114,7 @@ class PasswordPoliciesMiddlewareTest(TestCase):
 class PasswordPoliciesMiddlewareJsonSerializerTest(TestCase):
     def setUp(self):
         self.user = lib.create_user()
-        self.redirect_url = "http://testserver/password/change/?next=/"
+        self.redirect_url = "http://testserver/admin/password/change/?next=/"
 
     def test_password_middleware_without_history(self):
         seconds = settings.PASSWORD_DURATION_SECONDS - 60

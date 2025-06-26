@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from password_policies.conf import settings
 from password_policies.models import PasswordHistory
-from password_policies.tests import lib
+from tests.example import lib
 
 
 class PasswordHistoryModelTestCase(TestCase):

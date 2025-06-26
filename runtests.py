@@ -9,11 +9,11 @@ from django.test.utils import get_runner
 
 
 def runtests(*test_args):
-    os.environ["DJANGO_SETTINGS_MODULE"] = "password_policies.tests.test_settings"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "tests.example.tests.test_settings"
     django.setup()
     TestRunner = get_runner(settings)
     test_runner = TestRunner()
-    failures = test_runner.run_tests(["password_policies.tests"])
+    failures = test_runner.run_tests(["tests.example.tests"])
     sys.exit(bool(failures))
 
 

@@ -5,3 +5,4 @@ tox
 codecov
 pre-commit
 freezegun
+djangorestframework>3.14

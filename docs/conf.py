@@ -20,7 +20,7 @@ import django
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "_ext")))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "password_policies.tests.test_settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.example.tests.test_settings")
 
 
 django.setup()

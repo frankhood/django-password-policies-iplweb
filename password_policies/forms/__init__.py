@@ -264,14 +264,13 @@ class PasswordResetForm(forms.Form):
         self.users_cache = get_user_model().objects.filter(
             email__iexact=email, is_active=True
         )
-        if not len(self.users_cache):
-            raise forms.ValidationError(self.error_messages["unknown"])
         if any(not is_password_usable(user.password) for user in self.users_cache):
             raise forms.ValidationError(self.error_messages["unusable"])
         return email
 
     def save(
         self,
+        token,
         domain_override=None,
         subject_template_name="registration/password_reset_subject.txt",
         email_template_name="registration/password_reset_email.txt",
@@ -309,6 +308,7 @@ class PasswordResetForm(forms.Form):
             c["timestamp"] = var[1]
             c["uid"] = urlsafe_base64_encode(force_bytes(user.id))
             c["user"] = user
+            c["token"] = token.make_token(user)
             subject = loader.render_to_string(subject_template_name, c)
             # Email subject *must not* contain newlines
             subject = "".join(subject.splitlines())

@@ -85,7 +85,8 @@ class BaseSimilarityValidator:
     a similarity between 0.0 and 1.0.
 
     Raises a :class:`~django.core.exceptions.ValidationError` if the similarity
-    is greater than :py:attr:`~password_policies.conf.Settings.PASSWORD_MATCH_THRESHOLD`."""
+    is greater than :py:attr:`~password_policies.conf.Settings.PASSWORD_MATCH_THRESHOLD`.
+    """
 
     # Taken from django-passwords
 
@@ -129,7 +130,8 @@ class BaseSimilarityValidator:
 
     def get_threshold(self):
         """
-        :returns: :py:attr:`password_policies.conf.Settings.PASSWORD_MATCH_THRESHOLD`."""
+        :returns: :py:attr:`password_policies.conf.Settings.PASSWORD_MATCH_THRESHOLD`.
+        """
         return settings.PASSWORD_MATCH_THRESHOLD
 
 
@@ -475,7 +477,8 @@ Ll    Letter, Lowercase
 
     def get_min_count(self):
         """
-        :returns: :py:attr:`password_policies.conf.Settings.PASSWORD_MIN_LOWERCASE_LETTERS`"""
+        :returns: :py:attr:`password_policies.conf.Settings.PASSWORD_MIN_LOWERCASE_LETTERS`
+        """
         return settings.PASSWORD_MIN_LOWERCASE_LETTERS
 
 
@@ -516,7 +519,8 @@ Lu    Letter, Uppercase
 
     def get_min_count(self):
         """
-        :returns: :py:attr:`password_policies.conf.Settings.PASSWORD_MIN_UPPERCASE_LETTERS`"""
+        :returns: :py:attr:`password_policies.conf.Settings.PASSWORD_MIN_UPPERCASE_LETTERS`
+        """
         return settings.PASSWORD_MIN_UPPERCASE_LETTERS
 
 
