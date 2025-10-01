@@ -46,7 +46,7 @@ class ForceChangeAdminForm(PasswordPoliciesAdminForm):
         user = super().save(commit=commit)
         if (
             self.cleaned_data["change_required"]
-            and not PasswordChangeRequired.objects.filter(user=user).count()
+            and not PasswordChangeRequired.objects.filter(user=user).exists()
         ):
             PasswordChangeRequired.objects.create(user=user)
         return user
@@ -55,6 +55,6 @@ class ForceChangeAdminForm(PasswordPoliciesAdminForm):
 class ForceChangeRequiredAdminForm(PasswordPoliciesAdminForm):
     def save(self, commit=True):
         user = super().save(commit=commit)
-        if not PasswordChangeRequired.objects.filter(user=user).count():
+        if not PasswordChangeRequired.objects.filter(user=user).exists():
             PasswordChangeRequired.objects.create(user=user)
         return user
