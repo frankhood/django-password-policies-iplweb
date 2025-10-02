@@ -2,7 +2,7 @@
 
 ``django-password-policies-iplweb`` is an application for the `Django`_ framework that
 provides unicode-aware password policies on password changes and resets and a
-mechanism to force password changes.
+mechanism to enforce password changes.
 
 
 ## Documentation
@@ -48,6 +48,17 @@ Add django-password-policies-iplweb's URL patterns:
 Add in your project/templates/registration password_reset_email.html and password_reset_email.txt like files in tests/example/templates/registration.
 
 The link "Forgotten your password or username?" in admin was generated creating url with name "admin_password_reset".
+
+To enforce password change, include PasswordChangeRequiredMixin in both your add and change form classes in the UserAdmin, making sure to place the mixin first in the inheritance list. In these forms, override save() and call super().save(). Finally, add the password_change_required field to add_fieldsets and fieldsets.
+
+Add it at the END of your `MIDDLEWARE`:
+
+```python
+    MIDDLEWARE = (
+        ...
+        'password_policies.middleware.PasswordChangeMiddleware',
+    )
+```
 
 ## Credits
 ---
