@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _  # noqa
 from .models import PasswordChangeRequired
 
 
-class PasswordChangeRequiredMixin(forms.Form):
+class PasswordChangeRequiredMixin(forms.ModelForm):
     require_password_change = forms.BooleanField(
         initial=False,
         required=False,
