@@ -6,17 +6,17 @@ from .models import PasswordChangeRequired
 
 
 class PasswordChangeRequiredMixin(forms.Form):
-    password_change_required = forms.BooleanField(
+    require_password_change = forms.BooleanField(
         initial=False,
         required=False,
-        label=_("Must change?"),
+        label=_("require password change"),
     )
 
     def save(self, commit=True):
         user = super().save(commit=commit)
 
         if (
-            self.cleaned_data.get("password_change_required", False)
+            self.cleaned_data.get("require_password_change", False)
             and not PasswordChangeRequired.objects.filter(user=user).exists()
         ):
             PasswordChangeRequired.objects.create(user=user)
