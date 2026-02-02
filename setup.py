@@ -8,7 +8,7 @@ tests_require = [
 
 setup(
     name="django-password-policies-iplweb",
-    version=__import__("password_policies").__version__,
+    version="2.1.1",
     description="A Django application to implent password policies.",
     long_description="""\
 django-password-policies is an application for the Django framework that
