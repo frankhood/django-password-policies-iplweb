@@ -41,6 +41,8 @@ LOGIN_URL = "/admin/login/"
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 ROOT_URLCONF = "tests.example.urls"
 
 SITE_ID = 1
