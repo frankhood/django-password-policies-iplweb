@@ -1,7 +1,11 @@
+import unittest
+
+import django
 from django.test import TestCase, override_settings
 from django.utils.encoding import force_str
 
 from password_policies import forms
+from password_policies.forms.admin import ForceChangeAdminForm
 from tests.example import lib
 
 
@@ -220,3 +224,35 @@ class PasswordResetFormTest(TestCase):
         data = {"email": self.user.email}
         form = forms.PasswordResetForm(data)
         self.assertTrue(form.is_valid())
+
+
+class ForceChangeAdminFormTest(TestCase):
+    """
+    django.contrib.auth.forms.AdminPasswordChangeForm (Django >= 5.1) mixes in
+    SetUnusablePasswordMixin/SetPasswordMixin, which ForceChangeAdminForm
+    inherits without overriding clean()/save(). These tests confirm that
+    inherited usable_password/set_usable_password handling keeps working
+    unmodified for this package's admin form."""
+
+    def setUp(self):
+        self.user = lib.create_user()
+        return super().setUp()
+
+    def test_success(self):
+        data = {"password1": "Chah+pher9k", "password2": "Chah+pher9k"}
+        form = ForceChangeAdminForm(user=self.user, data=data)
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertTrue(user.has_usable_password())
+        self.assertTrue(user.check_password("Chah+pher9k"))
+
+    @unittest.skipUnless(
+        django.VERSION >= (5, 1),
+        "the usable_password toggle was added to AdminPasswordChangeForm in Django 5.1",
+    )
+    def test_set_unusable_password(self):
+        data = {"password1": "", "password2": "", "usable_password": "false"}
+        form = ForceChangeAdminForm(user=self.user, data=data)
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertFalse(user.has_usable_password())

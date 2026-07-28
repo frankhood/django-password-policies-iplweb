@@ -216,7 +216,6 @@ class PasswordPoliciesChangeForm(PasswordPoliciesForm):
                             raise forms.ValidationError(
                                 self.error_messages["password_similar"]
                             )
-        cleaned_data.setdefault('set_usable_password', True)
         return cleaned_data
 
     def save(self, commit=True):

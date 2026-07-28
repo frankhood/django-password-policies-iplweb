@@ -11,6 +11,13 @@ Unreleased
   ``django.contrib.admin``'s own ``registration/password_reset_email.html``
   (which isn't compatible with this package's 4-argument
   ``password_reset_confirm`` URL and raises ``NoReverseMatch``).
+* Removed a dead ``set_usable_password`` default in
+  ``PasswordPoliciesChangeForm.clean()`` that was never read anywhere.
+  ``ForceChangeAdminForm``/``PasswordPoliciesAdminForm`` already support
+  Django >= 5.1's real ``usable_password``/``set_usable_password`` mechanism
+  out of the box, via inheritance from
+  ``django.contrib.auth.forms.AdminPasswordChangeForm``; this is now covered
+  by tests.
 
 0.8.3
 -----
