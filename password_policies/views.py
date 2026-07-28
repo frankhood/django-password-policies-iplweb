@@ -142,10 +142,10 @@ class PasswordResetFormView(AdminSiteContextMixin, LoggedOutMixin, FormView):
 
     #: A relative path to a template in the root of a template directory
     #: to generate the body of the mail.
-    email_template_name = "registration/password_reset_email.txt"
+    email_template_name = "password_policies/password_reset_email.txt"
     #: A relative path to a template in the root of a template directory
     #: to generate the HTML attachment of the mail.
-    email_html_template_name = "registration/password_reset_email.html"
+    email_html_template_name = "password_policies/password_reset_email.html"
     #: The form used by this view.
     form_class = forms.PasswordResetForm
     #: The email address to use as sender of the email.

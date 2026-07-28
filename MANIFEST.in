@@ -1,3 +1,4 @@
 recursive-include password_policies/locale *
+recursive-include password_policies/templates *
 recursive-include password_policies/tests/templates *
 include requirements.txt

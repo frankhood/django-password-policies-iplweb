@@ -216,7 +216,6 @@ class PasswordPoliciesChangeForm(PasswordPoliciesForm):
                             raise forms.ValidationError(
                                 self.error_messages["password_similar"]
                             )
-        cleaned_data.setdefault('set_usable_password', True)
         return cleaned_data
 
     def save(self, commit=True):
@@ -274,8 +273,8 @@ class PasswordResetForm(forms.Form):
         token,
         domain_override=None,
         subject_template_name="registration/password_reset_subject.txt",
-        email_template_name="registration/password_reset_email.txt",
-        email_html_template_name="registration/password_reset_email.html",
+        email_template_name="password_policies/password_reset_email.txt",
+        email_html_template_name="password_policies/password_reset_email.html",
         use_https=False,
         from_email=None,
         request=None,
