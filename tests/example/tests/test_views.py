@@ -1,5 +1,5 @@
 from django.contrib.auth.tokens import default_token_generator
-from django.core import signing
+from django.core import mail, signing
 from django.test import Client, TestCase
 from django.test.utils import override_settings
 from django.urls.base import reverse
@@ -409,6 +409,25 @@ class PasswordResetFormViewTestCase(TestCase):
         data = {"email": "emailnotok@gmail.com"}
         response = self.client.post(reverse("admin_password_reset"), data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_post_sends_email_using_packaged_default_templates(self):
+        """
+        The package must ship working default email templates: a project
+        installing password_policies without providing its own
+        registration/password_reset_email.* templates must not hit
+        TemplateDoesNotExist (or NoReverseMatch, if django.contrib.admin's
+        own registration/password_reset_email.html shadows ours) on the
+        first real password reset request.
+        """
+        data = {"email": self.user.email}
+        response = self.client.post(reverse("admin_password_reset"), data=data)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(response.url, reverse("password_reset_done"))
+        self.assertEqual(len(mail.outbox), 1)
+        sent = mail.outbox[0]
+        self.assertIn("reset/confirm/", sent.body)
+        html_body = sent.alternatives[0][0]
+        self.assertIn("reset/confirm/", html_body)
 
 
 class PasswordResetDoneViewTestCase(TestCase):
